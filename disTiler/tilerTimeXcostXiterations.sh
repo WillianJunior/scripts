@@ -21,21 +21,23 @@ else
 fi
 
 THRS=( 50 100 150 200 )
-ER=10
-ERODE=( $ER $ER $ER $ER )
-DL=10
-DILATE=( $DL $DL $DL $DL )
+ERODE=( 2 4 8 10 )
+DILATE=( 2 4 8 10 )
 
 echo "thrs/erode/dilate"
-echo -n "img time   it    "
-for (( p=0; p<${#THRS[@]}; p++ )); do
-    echo -n "${THRS[$p]}/${ERODE[$p]}/${DILATE[$p]} "
+echo -n "img time it "
+for (( T=0; T<${#THRS[@]}; T++ )); do
+    for (( E=0; E<${#ERODE[@]}; E++ )); do
+        for (( D=0; D<${#DILATE[@]}; D++ )); do
+            echo -n "${THRS[$T]}/${ERODE[$E]}/${DILATE[$D]} "
+        done
+    done
 done
 echo ""
 
 for I in ${IMGS[@]}; do
+    # initial test: exectime and iterations
     echo -n "$(basename $I) "
-    # echo "mpirun -np 2 ./iwpp ${I} -a 0"
     if [[ $EXEC == 1 ]]; then
         OUT=$(mpirun -np 2 ./iwpp ${I} -a 0)
         # echo "$OUT"
@@ -53,16 +55,21 @@ for I in ${IMGS[@]}; do
         CUR_TIME=0
         IT=0
     fi
-    echo -n "$CUR_TIME $IT "
-    
-    for (( p=0; p<${#THRS[@]}; p++ )); do
-       	# echo "mpirun -np 2 ./iwpp ${I} -a 0 -to -p ${THRS[$p]}/${ERODE[$p]}/${DILATE[$p]}"
-       	OUT=$(mpirun -np 2 ./iwpp ${I} -to -a 0 -p ${THRS[$p]}/${ERODE[$p]}/${DILATE[$p]})
-        # echo "$OUT"
-    #echo $(grep curMax <<< "$OUT")
-        CUR_COST=$(grep AVERAGE <<< "$OUT" | awk -e '{print $2}')
-        echo -n "$CUR_COST "
+    echo -n $CUR_TIME $IT" "
+
+    # get cost for each parameters set
+    for (( T=0; T<${#THRS[@]}; T++ )); do
+        for (( E=0; E<${#ERODE[@]}; E++ )); do
+            for (( D=0; D<${#DILATE[@]}; D++ )); do
+               	OUT=$(mpirun -np 2 ./iwpp ${I} -to -a 0 -p ${THRS[$T]}/${ERODE[$E]}/${DILATE[$D]})
+                # echo "$OUT"
+                #echo $(grep curMax <<< "$OUT")
+                CUR_COST=$(grep AVERAGE <<< "$OUT" | awk -e '{print $2}')
+                echo -n $CUR_COST" "
+            done
+        done
     done
+
     echo ""
 done
 
