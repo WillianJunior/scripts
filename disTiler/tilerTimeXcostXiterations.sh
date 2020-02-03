@@ -21,10 +21,10 @@ else
 fi
 
 THRS=( 100 150 )
-ERODE=( 2 )
-DILATE=( 2 )
-# ERODE=( 2 4 8 10 )
-# DILATE=( 2 4 8 10 )
+# ERODE=( 2 )
+# DILATE=( 2 )
+ERODE=( 2 4 8 10 )
+DILATE=( 2 4 8 10 )
 
 REPS=3
 
