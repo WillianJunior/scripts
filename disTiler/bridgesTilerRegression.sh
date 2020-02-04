@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH -N 1
 #SBATCH -p RM
-#SBATCH --ntasks-per-node 28
-#SBATCH -t 4:00:00
+#SBATCH --ntasks-per-node 2
+#SBATCH -t 2:00:00
 
 set -x
 
